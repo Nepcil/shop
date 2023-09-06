@@ -1,0 +1,31 @@
+[
+  {
+    "id": 1,
+    "name": "Vinyl",
+    "price": 10.99,
+    "description": "This is the description of the vinyl.",
+    "imageUrl": "https://m.media-amazon.com/images/I/71nEw-vfddL._AC_SX679_.jpg"
+
+  },
+  {
+    "id": 2,
+    "name": "Figurine",
+    "price": 19.99,
+    "description": "This is the description of the figurine.",
+    "imageUrl": "https://media.ldlc.com/r1600/mkp/99b6eadd417744fd8f5bc072cf2911a8.jpeg"
+  },
+  {
+      "id": 3,
+      "name": "Controller",
+      "price": 39.99,
+      "description": "This is the description for a PS5 Controller.",
+      "imageUrl": "https://images.unsplash.com/photo-1606160429008-751d8408a874?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1716&q=80"
+    },
+    {
+      "id": 4,
+      "name": "ps5",
+      "price": 39.99,
+      "description": "This is the description of a PS5",
+      "imageUrl": "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
+    }
+]
