@@ -58,8 +58,8 @@ class PanierController extends AbstractController
     {
         // Récupérer les données envoyées depuis le front-end, on recupère le token depuis l'en-tête de la requête
         $data = json_decode($request->getContent(), true);
-        $tokenstring = $request->headers->get('Authorization');
-        $token = explode(' ', $tokenstring);
+        // $tokenstring = $request->headers->get('Authorization');
+        // $token = explode(' ', $tokenstring);
 
         $produitId = $data['id'];
         //return new JsonResponse($produitId);
