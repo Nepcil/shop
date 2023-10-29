@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -41,6 +42,13 @@ class Panier
      * @ORM\Column(name="Quantite", type="integer", nullable=true)
      */
     private $quantite;
+
+    /**
+     * @ORM\Column(type="datetime") 
+     */
+    private $date;
+
+    
 
     public function getId(): ?int
     {
@@ -83,5 +91,16 @@ class Panier
         return $this;
     }
 
+    public function getDate(): ?DateTime
+    {
+        return $this->date;
+    }
+
+    public function setDate(DateTime $date): self
+    {
+        $this->date = $date;
+
+        return $this;
+    }
 
 }

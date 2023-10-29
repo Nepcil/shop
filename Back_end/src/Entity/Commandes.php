@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -45,6 +46,14 @@ class Commandes
      * @ORM\Column(name="Quantite", type="integer", nullable=false)
      */
     private $quantite;
+
+    /**
+     * @ORM\Column(type="datetime") 
+     */
+    private $date;
+
+    
+
     public function getId(): ?int
     {
         return $this->id;
@@ -83,6 +92,17 @@ class Commandes
     public function setQuantite(int $quantite): self
     {
         $this->quantite = $quantite;
+        return $this;
+    }
+    public function getDate(): ?DateTime
+    {
+        return $this->date;
+    }
+
+    public function setDate(DateTime $date): self
+    {
+        $this->date = $date;
+
         return $this;
     }
 }

@@ -14,11 +14,17 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class ProfilController extends AbstractController
 {
+    use UploadTrait;
+    
     private $userRepository;
     private $entityManager;
     private $passwordHasher;
 
-    public function __construct(UsersRepository $userRepository, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher)
+    public function __construct(
+        UsersRepository $userRepository, 
+        EntityManagerInterface $entityManager, 
+        UserPasswordHasherInterface $passwordHasher
+        )
     {
         $this->userRepository = $userRepository;
         $this->entityManager = $entityManager;
@@ -49,6 +55,7 @@ class ProfilController extends AbstractController
             // Mettre à jour les informations du profil avec les nouvelles données
             $user->setNom($data['nom']);
             $user->setPrenom($data['prenom']);
+            $user->setPortrait($data['portrait']);
             $user->setEmail($data['email']); // Ajouter le champ email
             $user->setTel($data['tel']);
             $user->setAdresse($data['adresse']);
@@ -70,6 +77,17 @@ class ProfilController extends AbstractController
             return new JsonResponse(['message' => 'Token invalide ou introuvable'], Response::HTTP_BAD_REQUEST);
         }
     }
+
+        /**
+         * @Route("/profil", name="profil_upload_image", methods="POST")
+         */
+        public function uploadImage(Request $request): Response
+        {
+            $uploadDirectory = '/portraitUser';
+            $this->handleUploadedImage($uploadDirectory);
+
+            return new JsonResponse(['message' => 'Image enregistré avec succès'], Response::HTTP_OK);
+        } 
 
     /**
      * @Route("/profil", name="profil_get", methods="GET")
@@ -101,6 +119,7 @@ class ProfilController extends AbstractController
                 'id' => $user->getId(),
                 'nom' => $user->getNom(),
                 'prenom' => $user->getPrenom(),
+                'portrait' => $user->getPortrait(),
                 'email' => $user->getEmail(), // Ajouter le champ email
                 'tel' => $user->getTel(),
                 'adresse' => $user->getAdresse(),

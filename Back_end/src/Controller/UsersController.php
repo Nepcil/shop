@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Security\UserRoles;
+use DateTime;
 use Symfony\Component\Validator\Validator\ValidatorInterface; // Importer la classe ValidatorInterface
 use Symfony\Component\Validator\Constraints as Assert; // Importer la classe Assert pour les contraintes de validation
 
@@ -99,7 +100,7 @@ class UsersController extends AbstractController
         } else {
             $user->setRoles([UserRoles::ROLE_USER]);
         }
-
+        $user->setDate(new DateTime())();
         // Enregistrement de l'utilisateur dans la base de données
         $this->entityManager->persist($user);
         $this->entityManager->flush();
@@ -167,6 +168,7 @@ class UsersController extends AbstractController
             $newToken = $activeToken->getToken();
         }
 
+
         return $this->json(['success' => true, 'role', 'message' => 'Connexion réussie', 'token' => $newToken, 'userId' => $user->getId()], 200);
     }
 
@@ -198,51 +200,6 @@ class UsersController extends AbstractController
         return $this->json(['success' => true, 'message' => 'Déconnexion réussie'], 200);
     }
 
-    //-----------------------------------------contact----------------------------------
-
-    /**
-     * @Route("/contact", name="contact", methods={"POST"})
-     */
-    public function contact(Request $request): Response
-    {
-        // Récupération des données du formulaire de contact
-        $data = json_decode($request->getContent(), true);
-        $email = $data['email'];
-        $nom = $data['nom'];
-        $message = $data['message'];
-
-        // Récupération du token depuis l'en-tête de la requête
-        $authorizationHeader = $request->headers->get('Authorization');
-        // Suppression du préfixe 'Bearer ' pour obtenir le token seul
-        $token = str_replace('Bearer ', '', $authorizationHeader);
-
-        // Vérification de l'existence et de l'activité du token
-        $activeToken = $this->entityManager->getRepository(Session::class)->findOneBy([
-            'token' => $token,
-            'statut' => true
-        ]);
-
-        $user = $this->userRepository->findOneBy(['email' => $email]);
-
-        if ($activeToken) {
-            // Création d'un nouveau message de contact
-            $newMessage = new Contact();
-            $newMessage->setEmail($email);
-            $newMessage->setNom($nom);
-            $newMessage->setMessage($message);
-            $newMessage->setDatemessage(new \DateTime());
-            $newMessage->setUsersid($user->getId());
-
-            // Enregistrement du message de contact dans la base de données
-            $this->entityManager->persist($newMessage);
-            $this->entityManager->flush();
-        } else {
-            // Gestion de l'erreur lorsque le token est invalide ou n'existe pas
-            return $this->json(['success' => false, 'message' => 'Token invalide ou introuvable'], 400);
-        }
-
-        return $this->json(['success' => true, 'message' => 'Message envoyé!'], 200);
-    }
 
     //-----------------------------------------fin User----------------------------------
 }

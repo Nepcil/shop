@@ -2,6 +2,9 @@
 
 namespace App\Entity;
 
+use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -36,6 +39,13 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(name="Prenom", type="string", length=100, nullable=true)
      */
     private $prenom;
+
+    /**
+     * @var string|null
+     *
+     * @ORM\Column(name="Portrait", type="string", length=255, nullable=true)
+     */
+    private $portrait;
 
     /**
      * @var string|null
@@ -86,6 +96,25 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $roles = ['ROLE_USER'];
 
+    /**
+     * @ORM\OneToMany(targetEntity="avis", mappedBy="usersid")
+     */
+    private $avis;
+
+    /**
+     * @ORM\Column(type="datetime") 
+     */
+    private $date;
+
+    
+
+
+    public function __construct()
+    {
+        $this->avis = new ArrayCollection();
+    }
+    
+
     public function getId(): ?int
     {
         return $this->id;
@@ -110,6 +139,17 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPrenom(?string $prenom): self
     {
         $this->prenom = $prenom;
+        return $this;
+    }
+
+    public function getPortrait(): ?string
+    {
+        return $this->portrait;
+    }
+
+    public function setPortrait(?string $portrait): self
+    {
+        $this->portrait = $portrait;
         return $this;
     }
 
@@ -207,8 +247,6 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function eraseCredentials()
     {
-        // Ici, vous pouvez effacer les données sensibles de l'utilisateur
-        // Par exemple, vous pouvez mettre $this->motdepasse à null
         $this->motdepasse = null;
     }
 
@@ -231,5 +269,47 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         } else {
             $this->roles = array_diff($this->roles, ['ROLE_ADMIN']);
         }
+    }
+
+    /**
+     * @return Collection|Avis[]
+     */
+    public function getAvis(): Collection
+    {
+        return $this->avis;
+    }
+
+    public function addAvis(Avis $avis): self
+    {
+        if (!$this->avis->contains($avis)) {
+            $this->avis[] = $avis;
+            $avis->setUserid($this->id); 
+        }
+
+        return $this;
+    }
+
+    public function removeAvis(Avis $avis): self
+    {
+        if ($this->avis->removeElement($avis)) {
+
+            if ($avis->getUserid() === $this) {
+                $avis->setUserid(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getDate(): ?DateTime
+    {
+        return $this->date;
+    }
+
+    public function setDate(DateTime $date): self
+    {
+        $this->date = $date;
+
+        return $this;
     }
 }

@@ -4,52 +4,109 @@ namespace App\Controller;
 
 use App\Entity\Categories;
 use App\Entity\Produits;
+use App\Repository\AvisRepository;
 use App\Repository\CategoriesRepository;
 use App\Repository\ProduitsRepository;
+use App\Repository\UsersRepository;
+use DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ProduitsController extends AbstractController
 {
+
+    private $produitsRepository;
+    private $entityManager;
+
+    public function __construct(ProduitsRepository $produitsRepository, EntityManagerInterface $entityManager)
+    {
+        $this->produitsRepository = $produitsRepository;
+        $this->entityManager = $entityManager;
+    }
+
+    private function getYoutubeVideoId(string $youtubeUrl): ?string
+    {
+        $urlComponents = parse_url($youtubeUrl);
+
+        if ($urlComponents && isset($urlComponents['query'])) {
+            parse_str($urlComponents['query'], $queryParameters);
+            return $queryParameters['v'] ?? null;
+        }
+
+        return null;
+    }
+
     /**
      * @Route("/products", name="get_all_products", methods="GET")
      */
-    public function getAllProducts(ProduitsRepository $produitsRepository): JsonResponse
+    public function getAllProducts(ProduitsRepository $produitsRepository, Produits $products): JsonResponse
     {
         $products = $produitsRepository->findBy([], ['id' => 'DESC']);
-
-        // Convertir les entités en tableau
         $data = [];
+
         foreach ($products as $product) {
+
+            $youtubeUrl = $product->getVideo();
+            $videoId = $this->getYoutubeVideoId($youtubeUrl);
+            
             $data[] = [
                 'id' => $product->getId(),
                 'name' => $product->getNomduproduit(),
                 'price' => $product->getPrix(),
                 'description' => $product->getDescription(),
                 'imageUrl' => $product->getImageUrl(),
-                'categorieID' => $product->getCategorieid(),
+                'video' => $videoId,
+                'imgage1' => $product->getImage1(),
+                'imgage2' => $product->getImage2(),
+                'imgage3' => $product->getImage3(),
+                'imgage4' => $product->getImage4(),
+                'imgage5' => $product->getImage5(),
+                'categorieID' => $product->getCategorieid()
             ];
         }
-        return new JsonResponse($data);
+        return new JsonResponse($data, 200);
     }
 
     /**
      * @Route("/products/{id}", methods="GET")
      */
-    public function getProduct(Produits $produit): JsonResponse
+    public function getProduct(
+        Produits $product, 
+        ProduitsRepository $produitsRepository, 
+        AvisRepository $avisRepository, 
+        Produits $produits
+        ): JsonResponse
     {
+        $youtubeUrl = $product->getVideo();
+        $videoId = $this->getYoutubeVideoId($youtubeUrl);
+        $productEntity = $produitsRepository->find($product);
+
+        // Vérifiez si le produit existe avant de tenter d'accéder à ses propriétés
+        if (!$productEntity) {
+            return new JsonResponse(['error' => 'Produit non trouvé'], 404);
+        }
+
         $data = [
-            'id' => $produit->getId(),
-            'name' => $produit->getNomduproduit(),
-            'price' => $produit->getPrix(),
-            'description' => $produit->getDescription(),
-            'imageUrl' => $produit->getImageUrl(),
-            'categorieID' => $produit->getCategorieid(),
+            'id' => $productEntity->getId(),
+            'name' => $productEntity->getNomduproduit(),
+            'price' => $productEntity->getPrix(),
+            'description' => $productEntity->getDescription(),
+            'imageUrl' => $productEntity->getImageUrl(),
+            'video' => $videoId,
+            'image1' => $productEntity->getImage1(),
+            'image2' => $productEntity->getImage2(),
+            'image3' => $productEntity->getImage3(),
+            'image4' => $productEntity->getImage4(),
+            'image5' => $productEntity->getImage5(),
+            'categorieID' => $productEntity->getCategorieid()
         ];
 
-        return new JsonResponse($data);
+        return new JsonResponse($data, 200);
+        
     }
 
     /**
@@ -63,8 +120,15 @@ class ProduitsController extends AbstractController
         $newProduct->setNomduproduit($data['name'] ?? null);
         $newProduct->setPrix($data['price'] ?? null);
         $newProduct->setDescription($data['description'] ?? null);
+        $newProduct->setVideo($data['video'] ?? null);
         $newProduct->setImageUrl($data['imageUrl'] ?? null);
+        $newProduct->setImage1($data['image1'] ?? null);
+        $newProduct->setImage2($data['image2'] ?? null);
+        $newProduct->setImage3($data['image3'] ?? null);
+        $newProduct->setImage4($data['image4'] ?? null);
+        $newProduct->setImage5($data['image5'] ?? null);
         $newProduct->setCategorieid($data['categorieID'] ?? null);
+        $newProduct->setDate(new DateTime)();
     
 
         $produitsRepository->save($newProduct, true);
@@ -91,13 +155,19 @@ class ProduitsController extends AbstractController
 
         $produit->setNomduproduit($data['name'] ?? $produit->getNomduproduit());
         $produit->setPrix($data['price'] ?? $produit->getPrix());
-        $produit->setPrix($data['categorieID'] ?? $produit->getCategorieid());
-        $produit->setPrix($data['description'] ?? $produit->getDescription());
-
+        $produit->setDescription($data['description'] ?? $produit->getDescription());
+        $produit->setImageUrl($data['imageUrl'] ?? $produit->getImageUrl());
+        $produit->setVideo($data['video'] ?? $produit->getVideo());
+        $produit->setImage1($data['image1'] ?? $produit->getImage1());
+        $produit->setImage2($data['image2'] ?? $produit->getImage2());
+        $produit->setImage3($data['image3'] ?? $produit->getImage3());
+        $produit->setImage4($data['image4'] ?? $produit->getImage4());
+        $produit->setImage5($data['image5'] ?? $produit->getImage5());
+        $produit->setCategorieid($data['categorieID'] ?? $produit->getCategorieid());
 
         $produitsRepository->save($produit, true);
 
-        return new JsonResponse(['status' => 'Produit modifié avec succès']);
+        return new JsonResponse(['status' => 'Produit modifié avec succès'], 200);
     }
 
     /**
@@ -116,7 +186,7 @@ class ProduitsController extends AbstractController
         
         if($data) 
         {
-            return new JsonResponse($data);
+            return new JsonResponse($data, 200);
         }
             
     }
@@ -124,7 +194,11 @@ class ProduitsController extends AbstractController
     /**
      * @Route("/sendCategories/{id}", name="send_categories", methods="GET")
      */
-    public function CategoriesName(Categories $cate, CategoriesRepository $categs, ProduitsRepository $product): JsonResponse
+    public function CategoriesName(
+        Categories $cate, 
+        CategoriesRepository $categs, 
+        ProduitsRepository $product
+        ): JsonResponse
     {
         
     $categoryId = $cate->getId();
@@ -132,48 +206,83 @@ class ProduitsController extends AbstractController
     $categoryId = $category->getId();
     $categoryName = $category->getNomCategorie();
     $productsInCategory = $product->findBy(['categorieid' => $categoryId]);
+    $latestProducts = $product->findBy([], ['date' => 'DESC'], 5);
+    
 
-    foreach ($productsInCategory as $prod) {
-            $data[] = [
-                'id' => $prod->getId(),
-                'name' => $prod->getNomduproduit(),
-                'price' => $prod->getPrix(),
-                'description' => $prod->getDescription(),
-                'imageUrl' => $prod->getImageUrl(),
-                'categorie' => $categoryName,
-                'categoryId' => $categoryId
-            ];
+        if ($categoryName === 'Nouveautés') {
+        
+            foreach ($latestProducts as $prod) {
+                $data[] = [
+                    'id' => $prod->getId(),
+                    'name' => $prod->getNomduproduit(),
+                    'price' => $prod->getPrix(),
+                    'description' => $prod->getDescription(),
+                    'imageUrl' => $prod->getImageUrl(),
+                    'categorie' => $categoryName,
+                    'categorieid' => $categoryId,
+                ];
+            }
+        } else {
+            
+            foreach ($productsInCategory as $prod) {
+                $data[] = [
+                    'id' => $prod->getId(),
+                    'name' => $prod->getNomduproduit(),
+                    'price' => $prod->getPrix(),
+                    'description' => $prod->getDescription(),
+                    'imageUrl' => $prod->getImageUrl(),
+                    'categorie' => $categoryName,
+                    'categorieid' => $categoryId
+                ];
+            }
         }
         
-        if (!$productsInCategory) {
+        if (empty($data)) {
             return new JsonResponse(['error' => 'La catégorie spécifiée n\'existe pas'], 404);
         }else{
-            return new JsonResponse($data);
+            return new JsonResponse($data, 200);
         }
-        
     }
-    
+
     /**
-     * @Route("/getUrl/{id}", methods="GET")
+     * @Route("/", name="last_videos", methods={"GET"})
      */
-    public function getUrl(Categories $catego, CategoriesRepository $categos, ProduitsRepository $product): JsonResponse
+    public function lastvideos(ProduitsRepository $product) 
     {
-        $categoryId = $catego->getId();
-        $categoryName = $catego->getNomCategorie();
-        $category = $categos->find($categoryId);
-        $productsInCategory = $product->findBy(['categorieid' => $category]);
+        $lastVid = $product->findBy([], ['date' => 'DESC'], 5);
 
-        function addUrlParam($params=[]){
-        $p = array_merge($_GET, $params);
-        $qs = http_build_query($p);
-        return basename($_SERVER['PHP_SELF']).$qs;
-        } 
-
-        $url = addUrlParam(['' => $categoryName]);
-    
-        if($productsInCategory){
-            return new JsonResponse($url);
+        if (empty($lastVid)) {
+            return new JsonResponse(['error' => 'Aucune vidéo trouvée'], 404);
         }
-    
+
+        $data = [];
+
+        foreach ($lastVid as $video) {
+            $youtubeUrl = $video->getVideo();
+            // Utilisez parse_url pour obtenir les composants de l'URL
+            $urlComponents = parse_url($youtubeUrl);
+            if ($urlComponents && isset($urlComponents['query'])) {
+                // Utilisez parse_str pour obtenir les paramètres de la requête
+                parse_str($urlComponents['query'], $queryParameters);
+                // L'identifiant de la vidéo est dans le paramètre 'v'
+                $videoId = $queryParameters['v'];
+                
+                $data[] = [
+                    'id' => $video->getId(),
+                    'name' => $video->getNomduProduit(),
+                    'video' => $videoId,
+                ];
+            } else {// Gérer le cas où l'URL ne contient pas de paramètres de requête
+                $data[] = [
+                    'id' => $video->getId(),
+                    'name' => $video->getNomduProduit(),
+                    'video' => null,
+                ];
+            }
+        }
+
+        return new JsonResponse($data, 200);
     }
+
+
 }

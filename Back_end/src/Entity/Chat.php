@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -39,6 +40,14 @@ class Chat
      * @ORM\Column(name="DateMessage", type="datetime", nullable=true)
      */
     private $datemessage;
+
+    /**
+     * @ORM\Column(type="datetime") 
+     */
+    private $date;
+
+    
+
     public function getId(): ?int
     {
         return $this->id;
@@ -68,6 +77,17 @@ class Chat
     public function setDatemessage(?\DateTimeInterface $datemessage): self
     {
         $this->datemessage = $datemessage;
+        return $this;
+    }
+    public function getDate(): ?DateTime
+    {
+        return $this->date;
+    }
+
+    public function setDate(DateTime $date): self
+    {
+        $this->date = $date;
+
         return $this;
     }
 }

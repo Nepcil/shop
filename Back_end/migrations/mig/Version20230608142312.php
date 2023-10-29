@@ -20,7 +20,16 @@ final class Version20230608142312 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE TABLE session (idSession INT AUTO_INCREMENT NOT NULL, token VARCHAR(500) NOT NULL, idUser INT NOT NULL, statut TINYINT(1) NOT NULL, dateDebut DATE NOT NULL, dateFin DATE NOT NULL, PRIMARY KEY(idSession)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        // $this->addSql('CREATE TABLE session (idSession INT AUTO_INCREMENT NOT NULL, token VARCHAR(500) NOT NULL, idUser INT NOT NULL, statut TINYINT(1) NOT NULL, dateDebut DATE NOT NULL, dateFin DATE NOT NULL, PRIMARY KEY(idSession)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE IF NOT EXISTS session (
+            idSession INT AUTO_INCREMENT NOT NULL,
+            token VARCHAR(500) NOT NULL,
+            idUser INT NOT NULL,
+            statut TINYINT(1) NOT NULL,
+            dateDebut DATE NOT NULL,
+            dateFin DATE NOT NULL,
+            PRIMARY KEY(idSession)
+        ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('ALTER TABLE token DROP FOREIGN KEY FK_5F37A13BA76ED395');
         $this->addSql('DROP TABLE token');
         $this->addSql('ALTER TABLE avis DROP FOREIGN KEY FK_8F91ABF0E05BD40A');
@@ -48,6 +57,7 @@ final class Version20230608142312 extends AbstractMigration
         $this->addSql('DROP INDEX CommandeID ON reglement');
         $this->addSql('DROP INDEX Email ON users');
         $this->addSql('ALTER TABLE users CHANGE Email email VARCHAR(100) NOT NULL');
+        
     }
 
     public function down(Schema $schema): void

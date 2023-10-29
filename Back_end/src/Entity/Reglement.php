@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -42,6 +43,13 @@ class Reglement
      * @ORM\Column(name="DateReglement", type="datetime", nullable=true)
      */
     private $datereglement;
+
+    /**
+     * @ORM\Column(type="datetime") 
+     */
+    private $date;
+
+    
 
     public function getId(): ?int
     {
@@ -84,5 +92,16 @@ class Reglement
         return $this;
     }
 
+    public function getDate(): ?DateTime
+    {
+        return $this->date;
+    }
+
+    public function setDate(DateTime $date): self
+    {
+        $this->date = $date;
+
+        return $this;
+    }
 
 }

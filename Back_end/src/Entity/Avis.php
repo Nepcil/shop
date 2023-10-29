@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use Doctrine\DBAL\Types\Types;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -25,9 +25,9 @@ class Avis
     /**
      * @var int|null
      *
-     * @ORM\Column(name="UsersID", type="integer", nullable=true)
+     * @ORM\Column(name="UserID", type="integer", nullable=true)
      */
-    private $usersid;
+    private $userid;
 
     /**
      * @var int|null
@@ -37,11 +37,25 @@ class Avis
     private $produitid;
 
     /**
-     * @var int|null
+     * @var float|null
      *
-     * @ORM\Column(name="Note", type="integer", nullable=true)
+     * @ORM\Column(name="Note", type="float", nullable=true)
      */
     private $note;
+
+    /**
+     * @var int|null
+     *
+     * @ORM\Column(name="Handup", type="integer", nullable=true)
+     */
+    private $handup;
+
+    /**
+     * @var int|null
+     *
+     * @ORM\Column(name="Handless", type="integer", nullable=true)
+     */
+    private $handless;
 
     /**
      * @var string|null
@@ -50,19 +64,26 @@ class Avis
      */
     private $commentaire;
 
+    /**
+     * @ORM\Column(type="datetime") 
+     */
+    private $date;
+
+    
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getUsersid(): ?int
+    public function getUserid(): ?int
     {
-        return $this->usersid;
+        return $this->userid;
     }
 
-    public function setUsersid(?int $usersid): self
+    public function setUserid(?int $userid): self
     {
-        $this->usersid = $usersid;
+        $this->userid = $userid;
 
         return $this;
     }
@@ -79,14 +100,38 @@ class Avis
         return $this;
     }
 
-    public function getNote(): ?int
+    public function getNote(): ?float
     {
         return $this->note;
     }
 
-    public function setNote(?int $note): self
+    public function setNote(?float $note): self
     {
         $this->note = $note;
+
+        return $this;
+    }
+
+    public function getHandup(): ?int
+    {
+        return $this->handup;
+    }
+
+    public function setHandup(?int $handup): self
+    {
+        $this->handup = $handup;
+
+        return $this;
+    }
+
+    public function getHandless(): ?int
+    {
+        return $this->handless;
+    }
+
+    public function setHandless(?int $handless): self
+    {
+        $this->handless = $handless;
 
         return $this;
     }
@@ -103,5 +148,15 @@ class Avis
         return $this;
     }
 
+    public function getDate(): ?DateTime
+    {
+        return $this->date;
+    }
 
+    public function setDate(DateTime $date): self
+    {
+        $this->date = $date;
+
+        return $this;
+    }
 }

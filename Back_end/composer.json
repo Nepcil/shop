@@ -14,11 +14,12 @@
         "firebase/php-jwt": "^6.5",
         "lexik/jwt-authentication-bundle": "^2.18",
         "nelmio/cors-bundle": "^2.3",
-        "symfony/apache-pack": "*",
         "symfony/console": "6.2.*",
         "symfony/dotenv": "6.2.*",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "6.2.*",
+        "symfony/mailer": "6.2.*",
+        "symfony/mime": "6.2.*",
         "symfony/runtime": "6.2.*",
         "symfony/security-bundle": "6.2.*",
         "symfony/serializer": "6.2.*",
@@ -27,6 +28,7 @@
         "symfony/yaml": "6.2.*"
     },
     "require-dev": {
+        "symfony/debug-bundle": "6.2.*",
         "symfony/maker-bundle": "^1.48"
     },
     "config": {

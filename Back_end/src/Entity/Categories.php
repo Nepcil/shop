@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -28,6 +29,12 @@ class Categories
      */
     private $nomcategorie;
 
+    /**
+     * @ORM\Column(type="datetime") 
+     */
+    private $date;
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -41,6 +48,18 @@ class Categories
     public function setNomCategorie(?string $nomcategorie): self
     {
         $this->nomcategorie = $nomcategorie;
+        return $this;
+    }
+    
+    public function getDate(): ?DateTime
+    {
+        return $this->date;
+    }
+
+    public function setDate(DateTime $date): self
+    {
+        $this->date = $date;
+
         return $this;
     }
 
