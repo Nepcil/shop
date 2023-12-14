@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+
 class ProduitsController extends AbstractController
 {
 
@@ -28,6 +29,10 @@ class ProduitsController extends AbstractController
         $this->entityManager = $entityManager;
     }
 
+    //------------------------------------espace public-----------------------
+
+    //------------------------------------gestion youtube---------------------
+
     private function getYoutubeVideoId(string $youtubeUrl): ?string
     {
         $urlComponents = parse_url($youtubeUrl);
@@ -39,6 +44,61 @@ class ProduitsController extends AbstractController
 
         return null;
     }
+
+    /**
+     * @Route("/", name="last_videos", methods={"GET"})
+     */
+    public function lastvideos(ProduitsRepository $product) 
+    {
+        $lastVid = $product->findBy([], ['date' => 'DESC'], 5);
+
+        if (empty($lastVid)) {
+            return new JsonResponse(['error' => 'Aucune vidéo trouvée'], 404);
+        }
+
+        $data = [];
+
+        // foreach ($lastVid as $video) {
+        //     $youtubeUrl = $video->getVideo();
+        //     // Utilisez parse_url pour obtenir les composants de l'URL
+        //     $urlComponents = parse_url($youtubeUrl);
+        //     if ($urlComponents && isset($urlComponents['query'])) {
+        //         // Utilisez parse_str pour obtenir les paramètres de la requête
+        //         parse_str($urlComponents['query'], $queryParameters);
+        //         // L'identifiant de la vidéo est dans le paramètre 'v'
+        //         $videoId = $queryParameters['v'];
+                
+        //         $data[] = [
+        //             'id' => $video->getId(),
+        //             'name' => $video->getNomduProduit(),
+        //             'video' => $videoId,
+        //         ];
+        //     } else {// Gérer le cas où l'URL ne contient pas de paramètres de requête
+        //         $data[] = [
+        //             'id' => $video->getId(),
+        //             'name' => $video->getNomduProduit(),
+        //             'video' => null,
+        //         ];
+        //     }
+        // }
+
+        foreach ($lastVid as $video) {
+            $youtubeUrl = $video->getVideo();
+            $request = Request::create($youtubeUrl);
+            $videoId = $request->query->get('v');
+        
+            $data[] = [
+                'id' => $video->getId(),
+                'name' => $video->getNomduProduit(),
+                'video' => $videoId,
+            ];
+        }
+        
+
+        return new JsonResponse($data, 200);
+    }
+
+    //------------------------------------get products---------------------
 
     /**
      * @Route("/products", name="get_all_products", methods="GET")
@@ -65,8 +125,9 @@ class ProduitsController extends AbstractController
                 'imgage3' => $product->getImage3(),
                 'imgage4' => $product->getImage4(),
                 'imgage5' => $product->getImage5(),
-                'categorieID' => $product->getCategorieid()
+                'categorieID' => $product->getCategorieid(),
             ];
+
         }
         return new JsonResponse($data, 200);
     }
@@ -106,68 +167,6 @@ class ProduitsController extends AbstractController
         ];
 
         return new JsonResponse($data, 200);
-        
-    }
-
-    /**
-     * @Route("/products", methods="POST")
-     */
-    public function createNewProduct(Request $request, ProduitsRepository $produitsRepository): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
-
-        $newProduct = new Produits();
-        $newProduct->setNomduproduit($data['name'] ?? null);
-        $newProduct->setPrix($data['price'] ?? null);
-        $newProduct->setDescription($data['description'] ?? null);
-        $newProduct->setVideo($data['video'] ?? null);
-        $newProduct->setImageUrl($data['imageUrl'] ?? null);
-        $newProduct->setImage1($data['image1'] ?? null);
-        $newProduct->setImage2($data['image2'] ?? null);
-        $newProduct->setImage3($data['image3'] ?? null);
-        $newProduct->setImage4($data['image4'] ?? null);
-        $newProduct->setImage5($data['image5'] ?? null);
-        $newProduct->setCategorieid($data['categorieID'] ?? null);
-        $newProduct->setDate(new DateTime)();
-    
-
-        $produitsRepository->save($newProduct, true);
-
-        return new JsonResponse($newProduct, 201);
-    }
-
-    /**
-     * @Route("/products/{id}", methods="DELETE")
-     */
-    public function deleteProduct(Produits $produit, ProduitsRepository $produitsRepository): JsonResponse
-    {
-        $produitsRepository->remove($produit, true);
-
-        return new JsonResponse(['Status' => 'Produit supprimé avec succès']);
-    }
-
-    /**
-     * @Route("/products/{id}", methods="PUT")
-     */
-    public function alterProduct(Produits $produit, Request $request, ProduitsRepository $produitsRepository): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
-
-        $produit->setNomduproduit($data['name'] ?? $produit->getNomduproduit());
-        $produit->setPrix($data['price'] ?? $produit->getPrix());
-        $produit->setDescription($data['description'] ?? $produit->getDescription());
-        $produit->setImageUrl($data['imageUrl'] ?? $produit->getImageUrl());
-        $produit->setVideo($data['video'] ?? $produit->getVideo());
-        $produit->setImage1($data['image1'] ?? $produit->getImage1());
-        $produit->setImage2($data['image2'] ?? $produit->getImage2());
-        $produit->setImage3($data['image3'] ?? $produit->getImage3());
-        $produit->setImage4($data['image4'] ?? $produit->getImage4());
-        $produit->setImage5($data['image5'] ?? $produit->getImage5());
-        $produit->setCategorieid($data['categorieID'] ?? $produit->getCategorieid());
-
-        $produitsRepository->save($produit, true);
-
-        return new JsonResponse(['status' => 'Produit modifié avec succès'], 200);
     }
 
     /**
@@ -195,18 +194,18 @@ class ProduitsController extends AbstractController
      * @Route("/sendCategories/{id}", name="send_categories", methods="GET")
      */
     public function CategoriesName(
-        Categories $cate, 
-        CategoriesRepository $categs, 
-        ProduitsRepository $product
+        Categories $categories, 
+        CategoriesRepository $categoriesRepository, 
+        ProduitsRepository $produitsRepository
         ): JsonResponse
     {
         
-    $categoryId = $cate->getId();
-    $category = $categs->find($categoryId);
-    $categoryId = $category->getId();
+    $categoryId = $categories->getId();
+    $category = $categoriesRepository->find($categoryId);
     $categoryName = $category->getNomCategorie();
-    $productsInCategory = $product->findBy(['categorieid' => $categoryId]);
-    $latestProducts = $product->findBy([], ['date' => 'DESC'], 5);
+    $productsInCategory = $produitsRepository->findBy(['categorieid' => $categoryId]);
+    $latestProducts = $produitsRepository->findBy([], ['date' => 'DESC'], 5);
+    $data = [];
     
 
         if ($categoryName === 'Nouveautés') {
@@ -239,50 +238,195 @@ class ProduitsController extends AbstractController
         
         if (empty($data)) {
             return new JsonResponse(['error' => 'La catégorie spécifiée n\'existe pas'], 404);
-        }else{
-            return new JsonResponse($data, 200);
         }
+        
+        return new JsonResponse($data, 200);
+        
+    }
+
+    
+    //-------------------------------------espace vendeur--------------------------------
+    
+
+    /**
+     * @Route("/vendeur", name="vendeur", name="vendeur", methods={"POST"})
+     */
+    public function createNewProduct(Request $request, ProduitsRepository $produitsRepository): JsonResponse
+    {
+        
+        $data = json_decode($request->getContent(), true);
+
+        $newProduct = new Produits();
+        $newProduct->setNomduproduit($data['name'] ?? null);
+        $newProduct->setPrix($data['price'] ?? null);
+        $newProduct->setDescription($data['description'] ?? null);
+        $newProduct->setVideo($data['video'] ?? null);
+        $newProduct->setQuantity($data['quantity'] ?? null);
+        $newProduct->setImageUrl($data['imageUrl'] ?? null);
+        $newProduct->setImage1($data['image1'] ?? null);
+        $newProduct->setImage2($data['image2'] ?? null);
+        $newProduct->setImage3($data['image3'] ?? null);
+        $newProduct->setImage4($data['image4'] ?? null);
+        $newProduct->setImage5($data['image5'] ?? null);
+        $newProduct->setCategorieid($data['categorieID'] ?? null);
+        $newProduct->setDate(new DateTime());
+    
+
+        $produitsRepository->save($newProduct, true);
+
+        return new JsonResponse($newProduct, 201);
     }
 
     /**
-     * @Route("/", name="last_videos", methods={"GET"})
+     * @Route("/vendeur-list", name="vendeur-list", name="", methods="GET")
      */
-    public function lastvideos(ProduitsRepository $product) 
+    public function getProductBuyer(ProduitsRepository $produitsRepository): JsonResponse
     {
-        $lastVid = $product->findBy([], ['date' => 'DESC'], 5);
-
-        if (empty($lastVid)) {
-            return new JsonResponse(['error' => 'Aucune vidéo trouvée'], 404);
-        }
-
+        $products = $produitsRepository->findBy([], ['id' => 'DESC']);
         $data = [];
 
-        foreach ($lastVid as $video) {
-            $youtubeUrl = $video->getVideo();
-            // Utilisez parse_url pour obtenir les composants de l'URL
-            $urlComponents = parse_url($youtubeUrl);
-            if ($urlComponents && isset($urlComponents['query'])) {
-                // Utilisez parse_str pour obtenir les paramètres de la requête
-                parse_str($urlComponents['query'], $queryParameters);
-                // L'identifiant de la vidéo est dans le paramètre 'v'
-                $videoId = $queryParameters['v'];
-                
-                $data[] = [
-                    'id' => $video->getId(),
-                    'name' => $video->getNomduProduit(),
-                    'video' => $videoId,
-                ];
-            } else {// Gérer le cas où l'URL ne contient pas de paramètres de requête
-                $data[] = [
-                    'id' => $video->getId(),
-                    'name' => $video->getNomduProduit(),
-                    'video' => null,
-                ];
-            }
-        }
+        foreach ($products as $product) {
 
+            $youtubeUrl = $product->getVideo();
+            $videoId = $this->getYoutubeVideoId($youtubeUrl);
+            
+            $data[] = [
+                'id' => $product->getId(),
+                'name' => $product->getNomduproduit(),
+                'price' => $product->getPrix(),
+                'description' => $product->getDescription(),
+                'quantity' => $product->getQuantity(),
+                'imageUrl' => $product->getImageurl(), // Corrected property name
+                'video' => $videoId,
+                'image1' => $product->getImage1(),
+                'image2' => $product->getImage2(),
+                'image3' => $product->getImage3(),
+                'image4' => $product->getImage4(),
+                'image5' => $product->getImage5(),
+                'categorieId' => $product->getCategorieid()
+            ];
+        }
         return new JsonResponse($data, 200);
     }
 
+    /**
+     * @Route("/vendeur-modifier/{id}", name="vendeur_modifier", methods="PUT")
+     */
+    public function alterProduct(Produits $produit, Request $request, ProduitsRepository $produitsRepository): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $produit->setNomduproduit($data['name'] ?? $produit->getNomduproduit());
+        $produit->setPrix($data['price'] ?? $produit->getPrix());
+        $produit->setDescription($data['description'] ?? $produit->getDescription());
+        $produit->setImageUrl($data['imageUrl'] ?? $produit->getImageUrl());
+        $produit->setQuantity($data['quantity'] ?? $produit->getQuantity());
+        $produit->setVideo($data['video'] ?? $produit->getVideo());
+        $produit->setImage1($data['image1'] ?? $produit->getImage1());
+        $produit->setImage2($data['image2'] ?? $produit->getImage2());
+        $produit->setImage3($data['image3'] ?? $produit->getImage3());
+        $produit->setImage4($data['image4'] ?? $produit->getImage4());
+        $produit->setImage5($data['image5'] ?? $produit->getImage5());
+        $produit->setCategorieid($data['categorieID'] ?? $produit->getCategorieid());
+
+        $produitsRepository->save($produit, true);
+
+        return new JsonResponse(['status' => 'Produit modifié avec succès'], 200);
+    }
+    
+    /**
+     * @Route("/vendeur-delete/{id}", name="vendeur_delete", methods="DELETE")
+     */
+    public function deleteProduct(Produits $produit, ProduitsRepository $produitsRepository): JsonResponse
+    {
+        $produitsRepository->remove($produit, true);
+
+        return new JsonResponse(['Status' => 'Produit supprimé avec succès'], 200);
+    }
+
+    // --------------- anciennes fonctions ----------------------
+
+    // /**
+    //  * @Route("/vendeur", name="vendeur", methods={"POST"})
+    //  */
+    // public function vendeurCreate(Request $request): Response
+    // {
+    //     $data = json_decode($request->getContent(), true);
+
+    //     // Vérification de la présence de toutes les informations nécessaires
+    //     if (
+    //         !isset($data['NomDuProduit']) || 
+    //         !isset($data['Description']) || 
+    //         !isset($data['Prix']) || 
+    //         !isset($data['imageUrl']) || 
+    //         !isset($data['categorieId']) || 
+    //         !isset($data['quantity']) 
+    //     ) {
+    //         return $this->json(['message' => 'Informations manquantes'], 400);
+    //     }
+
+    //     $nomProduit = $data['NomDuProduit'];
+    //     $description = $data['Description'];
+    //     $categorie = $data['categorieId'];
+    //     $imageUrl = $data['imageUrl'];
+    //     $quantity = $data['quantity'];
+    //     $price = $data['Prix'];
+    //     $video = isset($data['Video']) ? $data['Video'] : null;
+    //     $image1 = isset($data['image1']) ? $data['image1'] : null;
+    //     $image2 = isset($data['image2']) ? $data['image2'] : null;
+    //     $image3 = isset($data['Image3']) ? $data['Image3'] : null;
+    //     $image4 = isset($data['Image4']) ? $data['Image4'] : null;
+    //     $image5 = isset($data['Image5']) ? $data['Image5'] : null; 
+
+    //     // Création d'un nouveau produit
+    //     $produit = new Produits();
+    //     $produit->setNomduproduit($nomProduit);
+    //     $produit->setDescription($description);
+    //     $produit->setCategorieid($categorie);
+    //     $produit->setImageurl($imageUrl);
+    //     $produit->setQuantity($quantity);
+    //     $produit->setPrix($price);
+    //     $produit->setVideo($video);
+    //     $produit->setImage1($image1);
+    //     $produit->setImage2($image2);
+    //     $produit->setImage3($image3);
+    //     $produit->setImage4($image4);
+    //     $produit->setImage5($image5);
+
+    //     // Enregistrement de l'utilisateur dans la base de données
+    //     $this->entityManager->persist($produit);
+    //     $this->entityManager->flush();
+
+    //     return $this->json(['success' => true, 'message' => 'L\'ajout du produit a bien réussi'], 200);
+    // }
+
+    
+
+    // /**
+    //  * @Route("/vendeur-modifier/{id}", name="vendeur-modifier", methods="PUT")
+    //  */
+    // public function productModifier(Request $request, Produits $produit): Response
+    // {
+    //     $data = json_decode($request->getContent(), true);
+
+    //     $produit->setNomduproduit($data['name'] ?? null);
+    //     $produit->setDescription($data['description'] ?? null);
+    //     $produit->setCategorieid($data['categorieId'] ?? null);
+    //     $produit->setImageurl($data['imageUrl'] ?? null);
+    //     $produit->setQuantity($data['quantity'] ?? null);
+    //     $produit->setPrix($data['price'] ?? null);
+    //     $produit->setVideo($data['video'] ?? null);
+    //     $produit->setImage1($data['image1'] ?? null);
+    //     $produit->setImage2($data['image2'] ?? null);
+    //     $produit->setImage3($data['image3'] ?? null);
+    //     $produit->setImage4($data['image4'] ?? null);
+    //     $produit->setImage5($data['image5'] ?? null);
+    //     $produit->setDate(new DateTime()); 
+
+    //     $this->entityManager->persist($produit);
+    //     $this->entityManager->flush();
+
+    //     return $this->json(['success' => true, 'message' => 'Votre produit est bien modifié'], 200);
+    // }
 
 }

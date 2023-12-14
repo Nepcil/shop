@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Produits;
 use App\Repository\UsersRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -9,12 +10,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Entity\Session;
+use App\Repository\AvisRepository;
+use App\Repository\ProduitsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class ProfilController extends AbstractController
 {
-    use UploadTrait;
     
     private $userRepository;
     private $entityManager;
@@ -78,17 +80,6 @@ class ProfilController extends AbstractController
         }
     }
 
-        /**
-         * @Route("/profil", name="profil_upload_image", methods="POST")
-         */
-        public function uploadImage(Request $request): Response
-        {
-            $uploadDirectory = '/portraitUser';
-            $this->handleUploadedImage($uploadDirectory);
-
-            return new JsonResponse(['message' => 'Image enregistré avec succès'], Response::HTTP_OK);
-        } 
-
     /**
      * @Route("/profil", name="profil_get", methods="GET")
      */
@@ -131,4 +122,50 @@ class ProfilController extends AbstractController
             return new JsonResponse(['message' => 'Token invalide ou introuvable'], Response::HTTP_BAD_REQUEST);
         }
     }
+
+    /**
+     * @Route("/produit-detail/{id}/profil-public", name="public_profil_get", methods="GET")
+     */
+    public function publicProfilData(AvisRepository $avisRepository, ProduitsRepository $produitsRepository, UsersRepository $usersRepository, $produitId): Response
+    {
+        
+        $produit = $produitsRepository->find($produitId);
+    
+        if (!$produit) {
+            return new JsonResponse(['message' => 'Aucun produit trouvé'], Response::HTTP_NOT_FOUND);
+        }
+    
+        $avis = $avisRepository->findBy(['produitid' => $produitId]);
+    
+        $avisData = [];
+        foreach ($avis as $singleAvis) {
+            
+            $user = $usersRepository->find($singleAvis->getUserid());
+    
+            if ($user) {
+                $avisData[] = [
+                    'id' => $singleAvis->getId(),
+                    'user' => [
+                        'id' => $user->getId(),
+                        'prenom' => $user->getPrenom(),
+                        'portrait' => $user->getPortrait(),
+                        
+                    ],
+                    'commentaire' => $singleAvis->getCommentaire(),
+                    
+                ];
+            }
+        }
+        
+        $produitData = [
+            'produitid' => $produit->getId(),
+            'nom' => $produit->getNomduproduit(),  
+            
+            'avis' => $avisData,
+        ];
+        
+        return new JsonResponse($produitData, Response::HTTP_OK);
+    }
+
+
 }

@@ -37,13 +37,6 @@ class Avis
     private $produitid;
 
     /**
-     * @var float|null
-     *
-     * @ORM\Column(name="Note", type="float", nullable=true)
-     */
-    private $note;
-
-    /**
      * @var int|null
      *
      * @ORM\Column(name="Handup", type="integer", nullable=true)
@@ -96,18 +89,6 @@ class Avis
     public function setProduitid(?int $produitid): self
     {
         $this->produitid = $produitid;
-
-        return $this;
-    }
-
-    public function getNote(): ?float
-    {
-        return $this->note;
-    }
-
-    public function setNote(?float $note): self
-    {
-        $this->note = $note;
 
         return $this;
     }

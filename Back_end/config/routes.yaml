@@ -1,8 +1,11 @@
+# ------------------------- générale -----------------------
 controllers:
     resource:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+
+# ------------------------- products -----------------------
 
 products_list:
     path: /products
@@ -14,20 +17,51 @@ product_selection:
     controller: App\Controller\ProductController::getProduct
     methods: GET
 
-product_creation:
-    path: /products
-    controller: App\Controller\ProductController::createNewProduct
+lastvideos:
+    path: /
+    controller: App\Controller\ProduitsController::lastVideos
+    methods: GET
+
+# -------------------------- vendeur ------------------------
+    
+vendeur:
+    path: /vendeur
+    controller: App\Controller\ProduitsController::vendeur
     methods: POST
 
-product_deletion:
-    path: /products/{id}
-    controller: App\Controller\ProductController::deleteProduct
+vendeur_list:
+    path: /vendeur-list
+    controller: App\Controller\ProduitsController::getProductBuyer
+    methods: GET
+
+vendeur_modifier:
+    path: /vendeur-modifier/{id}
+    controller: App\Controller\ProduitsController::alterProduct
+    methods: PUT
+
+vendeur_delete:
+    path: /vendeur-delete/{id}
+    controller: App\Controller\ProduitsController::deleteProduct
     methods: DELETE
 
-product_modification:
-    path: /products/{id}
-    controller: App\Controller\ProductController::alterProduct
-    methods: PUT
+# ------------------------- product catégories -----------------------
+
+categories_list:
+    path: /categories
+    controller: App\Controller\ProduitsController::getCategories
+    methods: GET
+
+products_categories_list:
+    path: /categories/prod/{id}
+    controller: App\Controller\ProduitsController::CategoriesProduit
+    methods: GET
+
+send_categories:
+    path: /sendCategories/{id}
+    controller: App\Controller\ProduitsController::CategoriesName
+    methods: GET
+
+# ------------------------- users -----------------------
 
 login:
     path: /login
@@ -49,6 +83,8 @@ panier_getAllPanierItems:
     controller: App\Controller\PanierController::getAllPanierItems
     methods: GET
 
+# ------------------------- panier -----------------------
+
 panier_ajouter:
     path: /panier/add
     controller: App\Controller\PanierController::ajouterAuPanier
@@ -58,6 +94,8 @@ panier_supprimer:
     path: /panier/delete/{id}
     controller: App\Controller\PanierController::supprimerDuPanier
     methods: DELETE
+
+# ------------------------- profil -----------------------
 
 profil_modifier:
     path: /profil
@@ -69,10 +107,17 @@ profil_get:
     controller: App\Controller\ProfilController::getProfilData
     methods: GET
 
+public_profil_get:
+    path: /produit-detail/{id}/profil-public
+    controller: App\Controller\ProfilController::publicProfilData
+    methods: GET
+
 profil_upload_image:
     path: /profil
     controller: App\Controller\ProfilController::uploadImage
     methods: POST
+
+# ------------------------- commande -----------------------
 
 commandes:
     path: /commandes
@@ -84,6 +129,8 @@ commande_annuler:
     controller: App\Controller\CommandeController::annulerCommande
     methods: DELETE
 
+# ------------------------- chat -----------------------
+
 chat:
     path: /chat
     controller: App\Controller\ChatController::getChat
@@ -94,58 +141,31 @@ chat_annuler:
     controller: App\Controller\ChatController::annulerChat
     methods: DELETE
 
-categories_list:
-    path: /categories
-    controller: App\Controller\ProduitsController::getCategories
-    methods: GET
-
-products_categories_list:
-    path: /categories/prod/{id}
-    controller: App\Controller\ProduitsController::CategoriesProduit
-    methods: GET
-
-send_categories:
-    path: /sendCategories/{id}
-    controller: App\Controller\ProduitsController::CategoriesName
-    methods: GET
+# ------------------------- contact -----------------------
 
 contact:
     path: /contact
     controller: App\Controller\ContactController::contact
     methods: POST
 
-lastvideos:
-    path: /
-    controller: App\Controller\ProduitsController::lastVideos
-    methods: GET
-
-vendeur:
-    path: /vendeur
-    controller: App\Controller\VendeurController::vendeur
-    methods: POST
-
-vendeur_list:
-    path: /vendeur-list
-    controller: App\Controller\VendeurController::getProductBuyer
-    methods: GET
+# ------------------------- avis -----------------------
 
 avis_get:
     path: /produit-detail/{id}
-    controller: App\Controller\AvisController::getAvisForProduc
+    controller: App\Controller\AvisController::getAvis
     methods: GET
 
-avis_create:
-    path: /produit-detail/{id}/avis-create
+create_avis:
+    path: /produit-detail/{id}
     controller: App\Controller\AvisController::createAvis
     methods: POST
 
-avis_record_action:
-    path: /produit-detail/{id}/record-action
+record_action:
+    path: /produit-detail/{id}
     controller: App\Controller\AvisController::recordAction
-    methods: POST
+    methods: PUT
 
-avis_note:
-    path: /produit-detail/{id}/avis-note
-    controller: App\Controller\AvisController::saveNote
+new_record_action:
+    path: /produit-detail/{id}
+    controller: App\Controller\AvisController::newRecordAction
     methods: POST
-    
