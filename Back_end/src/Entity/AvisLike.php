@@ -6,12 +6,12 @@ use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Avis
+ * AvisLike
  *
- * @ORM\Table(name="avis")
- * @ORM\Entity(repositoryClass="App\Repository\AvisRepository")
+ * @ORM\Table(name="AvisLike")
+ * @ORM\Entity(repositoryClass="App\Repository\AvisLikeRepository")
  */
-class Avis
+class AvisLike
 {
     /**
      * @var int
@@ -37,18 +37,24 @@ class Avis
     private $produitid;
 
     /**
-     * @var string|null
+     * @var int|null
      *
-     * @ORM\Column(name="Commentaire", type="text", length=65535, nullable=true)
+     * @ORM\Column(name="Handup", type="integer", nullable=true)
      */
-    private $commentaire;
+    private $handup = 0;
+
+    /**
+     * @var int|null
+     *
+     * @ORM\Column(name="Handless", type="integer", nullable=true)
+     */
+    private $handless = 0;
 
     /**
      * @ORM\Column(type="datetime") 
      */
     private $date;
 
-    
 
     public function getId(): ?int
     {
@@ -79,17 +85,30 @@ class Avis
         return $this;
     }
 
-    public function getCommentaire(): ?string
+    public function getHandup(): ?int
     {
-        return $this->commentaire;
+        return $this->handup;
     }
 
-    public function setCommentaire(?string $commentaire): self
+    public function setHandup(?int $handup): self
     {
-        $this->commentaire = $commentaire;
+        $this->handup = $handup;
 
         return $this;
     }
+
+    public function getHandless(): ?int
+    {
+        return $this->handless;
+    }
+
+    public function setHandless(?int $handless): self
+    {
+        $this->handless = $handless;
+
+        return $this;
+    }
+
 
     public function getDate(): ?DateTime
     {
@@ -102,4 +121,5 @@ class Avis
 
         return $this;
     }
+
 }

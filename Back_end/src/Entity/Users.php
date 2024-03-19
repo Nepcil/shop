@@ -106,15 +106,18 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $date;
 
-    
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Favoris", mappedBy="user")
+     */
+    private $favoris;
 
 
     public function __construct()
     {
         $this->avis = new ArrayCollection();
+        $this->favoris = new ArrayCollection();
     }
     
-
     public function getId(): ?int
     {
         return $this->id;
@@ -271,6 +274,8 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         }
     }
 
+    //------------------------Avis--------------------
+
     /**
      * @return Collection|Avis[]
      */
@@ -312,4 +317,36 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    //------------------------favoris--------------------
+
+    /**
+     * @return Collection|Favoris[]
+     */
+    public function getFavoris(): Collection
+    {
+        return $this->favoris;
+    }
+
+    public function addFavoris(Favoris $favoris): self
+    {
+        if (!$this->favoris->contains($favoris)) {
+            $this->favoris[] = $favoris;
+            $favoris->setUserid($this->id);
+        }
+
+        return $this;
+    }
+
+    public function removeFavoris(Favoris $favoris): self
+    {
+        if ($this->favoris->removeElement($favoris)) {
+            if ($favoris->getUserid() === $this) {
+                $favoris->setUserid(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

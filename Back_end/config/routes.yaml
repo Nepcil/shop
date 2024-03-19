@@ -150,7 +150,7 @@ contact:
 
 # ------------------------- avis -----------------------
 
-avis_get:
+get_avis:
     path: /produit-detail/{id}
     controller: App\Controller\AvisController::getAvis
     methods: GET
@@ -165,7 +165,41 @@ record_action:
     controller: App\Controller\AvisController::recordAction
     methods: PUT
 
-new_record_action:
-    path: /produit-detail/{id}
-    controller: App\Controller\AvisController::newRecordAction
+# ------------------------- like -----------------------
+
+create_like:
+    path: /produit-detail/{id}/like
+    controller: App\Controller\AvisController::createLike
     methods: POST
+
+avis_like:
+    path: /produit-detail/{id}/like
+    controller: App\Controller\AvisController::getLike
+    methods: GET
+
+# ------------------------- Favoris -----------------------
+
+ajouter_favoris:
+    path: /favoris/ajouter
+    controller: App\Controller\FavorisController::ajouterFavoris
+    methods: POST
+
+supprimer_favoris:
+    path: /favoris/supprimer
+    controller: App\Controller\FavorisController::deleteFavoris
+    methods: DELETE
+
+supprimer_tous_favoris:
+    path: /favoris/supprimer-tous/{userid}
+    controller: App\Controller\FavorisController::deleteAll
+    methods: DELETE
+
+get_favoris:
+    path: /favoris/{id}/liste
+    controller: App\Controller\FavorisController::getFavoris
+    methods: GET
+
+get_all_favoris:
+    path: /favoris/all/{userid}
+    controller: App\Controller\FavorisController::getAllFavorisUser
+    methods: GET

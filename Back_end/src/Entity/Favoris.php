@@ -6,12 +6,12 @@ use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Avis
+ * Favoris
  *
- * @ORM\Table(name="avis")
- * @ORM\Entity(repositoryClass="App\Repository\AvisRepository")
+ * @ORM\Table(name="favoris")
+ * @ORM\Entity(repositoryClass="App\Repository\FavorisRepository")
  */
-class Avis
+class Favoris
 {
     /**
      * @var int
@@ -37,60 +37,33 @@ class Avis
     private $produitid;
 
     /**
-     * @var string|null
-     *
-     * @ORM\Column(name="Commentaire", type="text", length=65535, nullable=true)
-     */
-    private $commentaire;
-
-    /**
      * @ORM\Column(type="datetime") 
      */
     private $date;
 
-    
 
     public function getId(): ?int
     {
         return $this->id;
     }
-
     public function getUserid(): ?int
     {
         return $this->userid;
     }
-
     public function setUserid(?int $userid): self
     {
         $this->userid = $userid;
-
         return $this;
     }
-
     public function getProduitid(): ?int
     {
         return $this->produitid;
     }
-
     public function setProduitid(?int $produitid): self
     {
         $this->produitid = $produitid;
-
         return $this;
     }
-
-    public function getCommentaire(): ?string
-    {
-        return $this->commentaire;
-    }
-
-    public function setCommentaire(?string $commentaire): self
-    {
-        $this->commentaire = $commentaire;
-
-        return $this;
-    }
-
     public function getDate(): ?DateTime
     {
         return $this->date;
@@ -102,4 +75,5 @@ class Avis
 
         return $this;
     }
+
 }

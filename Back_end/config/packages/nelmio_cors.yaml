@@ -9,6 +9,7 @@ nelmio_cors:
         hosts: []
         origin_regex: false
         forced_allow_origin_value: ~
+
     paths:
         '^/products': # Configurez ici le chemin de votre API
             allow_origin: ['*']
@@ -47,3 +48,16 @@ nelmio_cors:
             allow_headers: ['*']
             allow_methods: ['GET', 'POST', 'PUT', 'DELETE']
             max_age: 3600 
+
+        '^/produit-detail': # Configurez ici le chemin de votre API
+            allow_origin: ['*']
+            allow_headers: ['*']
+            allow_methods: ['GET', 'POST', 'PUT', 'DELETE']
+            max_age: 3600
+
+        '^/favoris': # Configurez ici le chemin de votre API
+            allow_origin: ['*']
+            allow_headers: ['*']
+            allow_methods: ['GET', 'POST', 'PUT', 'DELETE']
+            max_age: 3600
+        
