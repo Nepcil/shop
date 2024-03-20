@@ -37,69 +37,80 @@ class PanierController extends AbstractController
     }
 
     /**
-     * @Route("/panier", name="panier_list", methods={"GET"})
+     * @Route("/panier", name="panier_list", methods="GET")
      */
-    public function getAllPanierItems(PanierRepository $panierRepository, ProduitsRepository $produitsRepository): JsonResponse
+    public function getAllPanierItems(Request $request, PanierRepository $panierRepository, ProduitsRepository $produitsRepository): JsonResponse
     {
-        $items = $panierRepository->findAll();
+        $userId = $request->query->get('userId'); 
+        $items = $panierRepository->findBy(['userid' => $userId]);
 
-        // Convertir les entités en tableau
-        $data = [];
-        foreach ($items as $product) {
-            $ProductInfo = $produitsRepository->findOneBy(['id' => $product->getProduitid()]);
-            $data[] = [
-                'id' => $ProductInfo->getId(),
-                'name' => $ProductInfo->getNomduproduit(),
-                'price' => $ProductInfo->getPrix(),
-                'description' => $ProductInfo->getDescription(),
-                'imageUrl' => $ProductInfo->getImageUrl(),
-                'categorie' => $ProductInfo->getCategorieid(),
-                'quantite' => $product->getQuantite(),
-            ];
-        }
+        if ($userId) {
+
+            $data = [];
+            foreach ($items as $product) {
+                $ProductInfo = $produitsRepository->findOneBy(['id' => $product->getProduitid()]);
+                $data[] = [
+                    'id' => $ProductInfo->getId(),
+                    'name' => $ProductInfo->getNomduproduit(),
+                    'price' => $ProductInfo->getPrix(),
+                    'description' => $ProductInfo->getDescription(),
+                    'imageUrl' => $ProductInfo->getImageUrl(),
+                    'categorie' => $ProductInfo->getCategorieid(),
+                    'quantite' => $product->getQuantite(),
+                ];
+            }
+
         return new JsonResponse($data);
+
+        }
     }
 
-
     /**
-     * @Route("/panier/add/", name="panier_add", methods={"POST"})
+     * @Route("/panier/add/", name="panier_add", methods="POST")
      */
     public function ajouterAuPanier(Request $request, UsersRepository $usersRepository): Response
     {
-        // Récupérer les données envoyées depuis le front-end, on recupère le token depuis l'en-tête de la requête
         $data = json_decode($request->getContent(), true);
 
-        // $tokenstring = $request->headers->get('Authorization');
-        // $token = explode(' ', $tokenstring);
-        //return new JsonResponse($produitId);
+        if ($data !== null && isset($data['id']) && isset($data['quantite']) && isset($data['userId'])) {
 
-        $produitId = $data['id'];
-        $quantite = $data['quantite'];
-        $produit = $this->entityManager->getRepository(Produits::class)->find($produitId);// Récupérer le produit depuis la base de données
+            $produitId = $data['id'];
+            $quantite = $data['quantite'];
+            $userId = $data['userId']; 
 
-        $panier = $this->entityManager->getRepository(Panier::class)
-        ->findOneBy(['produitid' => $produit->getId()]);// Rechercher si le produit existe déjà dans le panier
+            $user = $usersRepository->find($userId);
+            if (!$user) {
+                return $this->json(['error' => 'Utilisateur introuvable'], 404);
+            }
 
-        if ($panier) {
-            // Si le produit existe déjà dans le panier, ajouter la quantité spécifiée
-            $panier->setQuantite($panier->getQuantite() + $quantite);
-        } else {
-            // Si le produit n'existe pas dans le panier, créer un nouvel enregistrement
-            $panier = new Panier();
-            $panier->setProduitid($produit->getId());
-            $panier->setQuantite($quantite);
-            $panier->setDate(new DateTime()); 
+            $produit = $this->entityManager->getRepository(Produits::class)->find($produitId);
+            if (!$produit) {
+                return $this->json(['error' => 'Produit introuvable'], 404);
+            }
 
-            // Sauvegarder le panier dans la base de données
-            $this->entityManager->persist($panier);
+            $panier = $this->entityManager->getRepository(Panier::class)->findOneBy(['produitid' => $produit->getId()]);
+            if ($panier) {
+                $panier->setQuantite($panier->getQuantite() + $quantite);
+            } else {
+                $panier = new Panier();
+                $panier->setProduitid($produit->getId());
+                $panier->setQuantite($quantite);
+                $panier->setUserid($userId);
+                $panier->setDate(new DateTime()); 
+
+                $this->entityManager->persist($panier);
+            }
+
             $this->entityManager->flush();
-        }
 
-        return $this->json(['success' => true, 'message' => 'produit ajouté au panier!'], 200);
+            return $this->json(['success' => true, 'message' => 'Produit ajouté au panier avec succès'], 200);
+        } else {
+            return $this->json(['error' => 'Données manquantes ou incorrectes'], 400);
+        }
     }
 
     /**
-     * @Route("/panier/delete/{id}", name="panier_delete", methods={"DELETE"})
+     * @Route("/panier/delete/{id}", name="panier_delete", methods="DELETE")
      */
     public function supprimerDuPanier($id): Response
     {
