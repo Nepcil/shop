@@ -16,13 +16,11 @@ use App\Repository\AvisLikeRepository;
 use App\Repository\AvisRepository;
 use App\Repository\UsersRepository;
 use DateTime;
-use Psr\Log\LoggerInterface;
 
 class AvisController extends AbstractController
 {
 
-    public function __construct(
-        )
+    public function __construct()
     {}
 
     /**

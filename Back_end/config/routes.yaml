@@ -78,12 +78,17 @@ register:
     controller: App\Controller\UsersController::register
     methods: POST
 
+# ------------------------- panier -----------------------
+
 panier_getAllPanierItems:
     path: /panier
     controller: App\Controller\PanierController::getAllPanierItems
     methods: GET
-
-# ------------------------- panier -----------------------
+    
+panier_num:
+    path: /panier/{userid}
+    controller: App\Controller\PanierController::getQuantity
+    methods: GET
 
 panier_ajouter:
     path: /panier/add
@@ -94,6 +99,11 @@ panier_supprimer:
     path: /panier/delete/{id}
     controller: App\Controller\PanierController::supprimerDuPanier
     methods: DELETE
+
+panier_update:
+    path: /panier/modifier
+    controller: App\Controller\PanierController::updatePanier
+    methods: PUT
 
 # ------------------------- profil -----------------------
 
@@ -107,26 +117,43 @@ profil_get:
     controller: App\Controller\ProfilController::getProfilData
     methods: GET
 
-public_profil_get:
-    path: /produit-detail/{id}/profil-public
-    controller: App\Controller\ProfilController::publicProfilData
-    methods: GET
-
 profil_upload_image:
     path: /profil
     controller: App\Controller\ProfilController::uploadImage
     methods: POST
 
-# ------------------------- commande -----------------------
+# ------------------------- profil-public -----------------------
 
-commandes:
-    path: /commandes
-    controller: App\Controller\CommandeController::getCommandes
+public_profil_user:
+    path: /profil-public/user/{id}
+    controller: App\Controller\ProfilController::publicProfilData
     methods: GET
 
-commande_annuler:
-    path: /commandes/{id}/annuler
-    controller: App\Controller\CommandeController::annulerCommande
+public_profil_get_product:
+    path: /profil-public/{id}
+    controller: App\Controller\ProfilController::getProduct
+    methods: GET
+
+# ------------------------- commande -----------------------
+
+getCommand:
+    path: /getCommand
+    controller: App\Controller\PanierController::getCommand
+    methods: GET
+
+command:
+    path: /command
+    controller: App\Controller\PanierController::command
+    methods: POST
+
+updateCommand:
+    path: /command/modifier
+    controller: App\Controller\PanierController::updateCommand
+    methods: PUT
+
+command_delete:
+    path: /command/{id}
+    controller: App\Controller\PanierController::deleteCommand
     methods: DELETE
 
 # ------------------------- chat -----------------------
@@ -195,11 +222,11 @@ supprimer_tous_favoris:
     methods: DELETE
 
 get_favoris:
-    path: /favoris/{id}/liste
+    path: /favoris/{id}/{userid}/liste
     controller: App\Controller\FavorisController::getFavoris
     methods: GET
 
 get_all_favoris:
-    path: /favoris/all/{userid}
+    path: /favoris/all/{id}
     controller: App\Controller\FavorisController::getAllFavorisUser
     methods: GET

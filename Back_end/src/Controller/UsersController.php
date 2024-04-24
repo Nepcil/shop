@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Contact;
 use App\Entity\Session;
 use App\Entity\Users;
 use App\Repository\UsersRepository;
@@ -15,9 +14,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Security\UserRoles;
 use DateTime;
-use Symfony\Component\Validator\Validator\ValidatorInterface; // Importer la classe ValidatorInterface
-use Symfony\Component\Validator\Constraints as Assert; // Importer la classe Assert pour les contraintes de validation
-
+use Symfony\Component\Validator\Validator\ValidatorInterface; 
+use Symfony\Component\Validator\Constraints as Assert;
 
 class UsersController extends AbstractController
 {
@@ -26,7 +24,11 @@ class UsersController extends AbstractController
     private $passwordHasher;
 
     // Constructeur avec injection de dépendances
-    public function __construct(UsersRepository $userRepository, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher)
+    public function __construct(
+        UsersRepository $userRepository, 
+        EntityManagerInterface $entityManager, 
+        UserPasswordHasherInterface $passwordHasher
+        )
     {
         $this->userRepository = $userRepository;
         $this->entityManager = $entityManager;
@@ -44,7 +46,13 @@ class UsersController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         // Vérification de la présence de toutes les informations nécessaires
-        if (!isset($data['nom']) || !isset($data['prenom']) || !isset($data['password']) || !isset($data['birthdate']) || !isset($data['email'])) {
+        if (
+            empty($data['nom']) || 
+            empty($data['prenom']) || 
+            empty($data['password']) || 
+            empty($data['birthdate']) || 
+            empty($data['email'])
+        ) {
             return $this->json(['message' => 'Informations manquantes'], 400);
         }
 
@@ -100,7 +108,7 @@ class UsersController extends AbstractController
         } else {
             $user->setRoles([UserRoles::ROLE_USER]);
         }
-        $user->setDate(new DateTime())();
+        $user->setDate(new DateTime());
         // Enregistrement de l'utilisateur dans la base de données
         $this->entityManager->persist($user);
         $this->entityManager->flush();

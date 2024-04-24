@@ -286,6 +286,8 @@ class Produits
         return $this;
     }
 
+    //---------------Avis--------------
+
     /**
      * @return Collection|Avis[]
      */
@@ -315,5 +317,6 @@ class Produits
 
         return $this;
     }
+    
 
 }

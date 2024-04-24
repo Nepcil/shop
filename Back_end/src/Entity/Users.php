@@ -29,14 +29,14 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var string|null
      *
-     * @ORM\Column(name="Nom", type="string", length=100, nullable=true)
+     * @ORM\Column(name="Nom", type="string", length=100, nullable=false)
      */
     private $nom;
 
     /**
      * @var string|null
      *
-     * @ORM\Column(name="Prenom", type="string", length=100, nullable=true)
+     * @ORM\Column(name="Prenom", type="string", length=100, nullable=false)
      */
     private $prenom;
 
@@ -50,7 +50,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var string|null
      *
-     * @ORM\Column(name="MotDePasse", type="string", length=255, nullable=true)
+     * @ORM\Column(name="MotDePasse", type="string", length=255, nullable=false)
      */
     private $motdepasse;
 
@@ -78,7 +78,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var \DateTime|null
      *
-     * @ORM\Column(name="DateDeNaissance", type="datetime", nullable=true)
+     * @ORM\Column(name="DateDeNaissance", type="datetime", nullable=false)
      */
     private $datedenaissance;
 
@@ -97,19 +97,19 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     private $roles = ['ROLE_USER'];
 
     /**
-     * @ORM\OneToMany(targetEntity="avis", mappedBy="usersid")
+     * @ORM\OneToMany(targetEntity="avis", mappedBy="usersid", cascade={"persist", "remove"})
      */
     private $avis;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Favoris", mappedBy="usersid", cascade={"persist", "remove"})
+     */
+    private $favoris;
 
     /**
      * @ORM\Column(type="datetime") 
      */
     private $date;
-
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Favoris", mappedBy="user")
-     */
-    private $favoris;
 
 
     public function __construct()
@@ -117,6 +117,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         $this->avis = new ArrayCollection();
         $this->favoris = new ArrayCollection();
     }
+
     
     public function getId(): ?int
     {
@@ -306,18 +307,6 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getDate(): ?DateTime
-    {
-        return $this->date;
-    }
-
-    public function setDate(DateTime $date): self
-    {
-        $this->date = $date;
-
-        return $this;
-    }
-
     //------------------------favoris--------------------
 
     /**
@@ -345,6 +334,20 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
                 $favoris->setUserid(null);
             }
         }
+
+        return $this;
+    }
+
+    //--------------------------date---------------
+
+    public function getDate(): ?DateTime
+    {
+        return $this->date;
+    }
+
+    public function setDate(DateTime $date): self
+    {
+        $this->date = $date;
 
         return $this;
     }

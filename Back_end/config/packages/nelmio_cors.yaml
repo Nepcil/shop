@@ -43,6 +43,12 @@ nelmio_cors:
             allow_methods: ['GET', 'POST', 'PUT', 'DELETE']
             max_age: 3600 
         
+        '^/profil-public': # Configurez ici le chemin de votre API
+            allow_origin: ['*']
+            allow_headers: ['*']
+            allow_methods: ['GET', 'POST', 'PUT', 'DELETE']
+            max_age: 3600 
+        
         '^/contact': # Configurez ici le chemin de votre API
             allow_origin: ['*']
             allow_headers: ['*']
@@ -56,6 +62,12 @@ nelmio_cors:
             max_age: 3600
 
         '^/favoris': # Configurez ici le chemin de votre API
+            allow_origin: ['*']
+            allow_headers: ['*']
+            allow_methods: ['GET', 'POST', 'PUT', 'DELETE']
+            max_age: 3600
+
+        '^/command': # Configurez ici le chemin de votre API
             allow_origin: ['*']
             allow_headers: ['*']
             allow_methods: ['GET', 'POST', 'PUT', 'DELETE']

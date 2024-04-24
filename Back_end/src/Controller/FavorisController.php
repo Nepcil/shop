@@ -4,15 +4,14 @@ namespace App\Controller;
 
 use App\Entity\Favoris;
 use App\Entity\Produits;
-use App\Entity\Users;
 use App\Repository\FavorisRepository;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use DateTime;
 
 class FavorisController extends AbstractController
 {
@@ -37,7 +36,10 @@ class FavorisController extends AbstractController
         $userid = $data['userid'];
         $produitid = $data['produitid'];
 
-        $favorisExistant = $this->favorisRepository->findOneBy(['userid' => $userid, 'produitid' => $produitid]);
+        $favorisExistant = $this->favorisRepository->findOneBy([
+            'userid' => $userid, 
+            'produitid' => $produitid
+        ]);
 
         if ($favorisExistant) {
             return $this->json(['error' => 'Ce produit est déjà enregistré dans la liste de favoris de cet utilisateur'], Response::HTTP_BAD_REQUEST);
@@ -46,6 +48,7 @@ class FavorisController extends AbstractController
         $favoris = new Favoris();
         $favoris->setUserid($userid);
         $favoris->setProduitid($produitid);
+        $favoris->setState(true);
         $favoris->setDate(new DateTime());
 
         $this->entityManager->persist($favoris);
@@ -93,42 +96,39 @@ class FavorisController extends AbstractController
     }
 
     /**
-     * @Route("/favoris/{id}/liste", name="get_favoris", methods="GET")
+     * @Route("/favoris/{id}/{userid}/liste", name="get_favoris", methods="GET")
      */
-    // public function getFavoris(Produits $produits, FavorisRepository $favorisRepository): JsonResponse
-    // {
-    //     $produitId = $produits->getId();
-    //     $favoriss = $favorisRepository->findBy(['produitid' => $produitId]);
+    public function getFavoris(
+        FavorisRepository $favorisRepository, 
+        Produits $product,
+        int $userid
+    ): JsonResponse {
 
-    //     $data = [];
-    //     foreach ($favoriss as $favoris) {
-    //         $data[] = [
-    //             'id' => $favoris->getId(),
-    //             'userid' => $favoris->getUserid(),
-    //             'produitid' => $produitId,
-    //         ];
-    //     }
-
-    //     return $this->json($data);
-    // }
-
-    public function getFavoris(FavorisRepository $favorisRepository, $id): JsonResponse
-    {
+        $produitId = $product->getId();
         
-        $favoris = $favorisRepository->findBy(['produitid' => $id]);
-        $produitExists = count($favoris) > 0;
+        $favoris = $favorisRepository->findBy([
+            'produitid' => $produitId,
+            'userid' => $userid
+        ]);
+        
+        $favorisExist = count($favoris) > 0;
 
-        return $this->json(['produitExists' => $produitExists]);
+        if (!$favorisExist) { 
+            return $this->json(false);
+        }
+
+        return $this->json(['favorisExist' => $favorisExist]);
+
     }
 
     /**
-     * @Route("/favoris/all/{userid}", name="get_all_favoris", methods="GET")
+     * @Route("/favoris/all/{id}", name="get_all_favoris", methods="GET")
      */
-    public function getAllFavorisUser(int $userid, FavorisRepository $favorisRepository): JsonResponse
+    public function getAllFavorisUser(int $id, FavorisRepository $favorisRepository): JsonResponse
     {
-        $count = $favorisRepository->count(['userid' => $userid]);
+        $count = $favorisRepository->count(['userid' => $id]);
         
-        return $this->json(['count' => $count]);
+        return $this->json($count);
     }
     
 }

@@ -25,14 +25,14 @@ class Panier
     /**
      * @var int|null
      *
-     * @ORM\Column(name="UserID", type="integer", nullable=true)
+     * @ORM\Column(name="Userid", type="integer", nullable=true)
      */
     private $userid;
 
     /**
      * @var int|null
      *
-     * @ORM\Column(name="ProduitID", type="integer", nullable=true)
+     * @ORM\Column(name="Produitid", type="integer", nullable=true)
      */
     private $produitid;
 
@@ -44,11 +44,16 @@ class Panier
     private $quantite;
 
     /**
+     * @var float|null
+     *
+     * @ORM\Column(name="Price", type="float", nullable=true)
+     */
+    private $price;
+
+    /**
      * @ORM\Column(type="datetime") 
      */
     private $date;
-
-    
 
     public function getId(): ?int
     {
@@ -87,6 +92,18 @@ class Panier
     public function setQuantite(?int $quantite): self
     {
         $this->quantite = $quantite;
+
+        return $this;
+    }
+
+    public function getPrice(): ?float
+    {
+        return $this->price;
+    }
+
+    public function setPrice(?float $price): self
+    {
+        $this->price = $price;
 
         return $this;
     }

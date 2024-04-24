@@ -22,23 +22,17 @@ class Commandes
      */
     private $id;
     /**
-     * @var \DateTime|null
+     * @var int
      *
-     * @ORM\Column(name="DateCommande", type="datetime", nullable=true)
+     * @ORM\Column(name="userid", type="integer", nullable=false)
      */
-    private $datecommande;
+    private $userid;
     /**
      * @var int
      *
-     * @ORM\Column(name="idUser", type="integer", nullable=false)
+     * @ORM\Column(name="produitid", type="integer", nullable=false)
      */
-    private $iduser;
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="idProduit", type="integer", nullable=false)
-     */
-    private $idproduit;
+    private $produitid;
     /**
      * @var int
      *
@@ -47,41 +41,38 @@ class Commandes
     private $quantite;
 
     /**
+     * @var float|null
+     *
+     * @ORM\Column(name="price", type="float", nullable=true)
+     */
+    private $price;
+
+    /**
      * @ORM\Column(type="datetime") 
      */
     private $date;
 
-    
 
     public function getId(): ?int
     {
         return $this->id;
     }
-    public function getDatecommande(): ?\DateTimeInterface
+    public function getUserid(): ?int
     {
-        return $this->datecommande;
+        return $this->userid;
     }
-    public function setDatecommande(?\DateTimeInterface $datecommande): self
+    public function setUserid(int $userid): self
     {
-        $this->datecommande = $datecommande;
+        $this->userid = $userid;
         return $this;
     }
-    public function getIduser(): ?int
+    public function getProduitid(): ?int
     {
-        return $this->iduser;
+        return $this->produitid;
     }
-    public function setIduser(int $iduser): self
+    public function setProduitid(int $produitid): self
     {
-        $this->iduser = $iduser;
-        return $this;
-    }
-    public function getIdproduit(): ?int
-    {
-        return $this->idproduit;
-    }
-    public function setIdproduit(int $idproduit): self
-    {
-        $this->idproduit = $idproduit;
+        $this->produitid = $produitid;
         return $this;
     }
     public function getQuantite(): ?int
@@ -91,6 +82,15 @@ class Commandes
     public function setQuantite(int $quantite): self
     {
         $this->quantite = $quantite;
+        return $this;
+    }
+    public function getPrice(): ?float
+    {
+        return $this->price;
+    }
+    public function setPrice(?float $price): self
+    {
+        $this->price = $price;
         return $this;
     }
     public function getDate(): ?DateTime
@@ -104,4 +104,6 @@ class Commandes
 
         return $this;
     }
+
+    
 }

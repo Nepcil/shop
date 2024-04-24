@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Produits;
 use App\Repository\UsersRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -123,48 +122,75 @@ class ProfilController extends AbstractController
         }
     }
 
+    //---------------------------------- Profil-public -------------------
+
     /**
-     * @Route("/produit-detail/{id}/profil-public", name="public_profil_get", methods="GET")
+     * @Route("/profil-public/user/{id}", name="public_profil_user", methods="GET")
      */
-    public function publicProfilData(AvisRepository $avisRepository, ProduitsRepository $produitsRepository, UsersRepository $usersRepository, $produitId): Response
+    public function publicProfilData(
+        $id, 
+        UsersRepository $userRepository, 
+        AvisRepository $avisRepository, 
+        ProduitsRepository $produitRepository
+        ): JsonResponse
     {
-        
-        $produit = $produitsRepository->find($produitId);
-    
-        if (!$produit) {
-            return new JsonResponse(['message' => 'Aucun produit trouvé'], Response::HTTP_NOT_FOUND);
+        $user = $userRepository->findOneBy(['id' => $id]);
+        $avis = $avisRepository->findBy(['userid' => $id]);
+        $avisList = $avisRepository->findBy(['userid' => $id]);
+        $userFound = false;
+
+        if (!$user) {
+            return new JsonResponse(['message' => 'Utilisateur introuvable'], Response::HTTP_NOT_FOUND);
         }
-    
-        $avis = $avisRepository->findBy(['produitid' => $produitId]);
-    
-        $avisData = [];
-        foreach ($avis as $singleAvis) {
-            
-            $user = $usersRepository->find($singleAvis->getUserid());
-    
-            if ($user) {
-                $avisData[] = [
-                    'id' => $singleAvis->getId(),
-                    'user' => [
-                        'id' => $user->getId(),
-                        'prenom' => $user->getPrenom(),
-                        'portrait' => $user->getPortrait(),
-                        
-                    ],
-                    'commentaire' => $singleAvis->getCommentaire(),
-                    
-                ];
+
+        if (empty($avis)) {
+            return new JsonResponse(['message' => 'Aucun avis trouvé pour cet utilisateur et ce produit'], Response::HTTP_NOT_FOUND);
+        }
+
+        foreach ($avisList as $avis) {
+            if ($avis->getUserid() === $user->getId()) {
+                $userFound = true;
+                break;
             }
         }
-        
-        $produitData = [
-            'produitid' => $produit->getId(),
-            'nom' => $produit->getNomduproduit(),  
-            
-            'avis' => $avisData,
+
+        $profilData = [
+            'id' => $user->getId(),
+            'nom' => $user->getNom(),
+            'prenom' => $user->getPrenom(),
+            'portrait' => $user->getPortrait(),
         ];
-        
-        return new JsonResponse($produitData, Response::HTTP_OK);
+
+        return new JsonResponse($profilData, Response::HTTP_OK);
+    }
+    
+
+    /**
+     * @Route("/profil-public/{id}", methods="GET")
+     */
+    public function getProduct(
+        $id,
+        ProduitsRepository $produitRepository
+    ): JsonResponse
+    {
+        // Recherchez le produit dans le repository par son ID
+        $produit = $produitRepository->find($id);
+
+        // Vérifiez si le produit existe avant de tenter d'accéder à ses propriétés
+        if (!$produit) {
+            return new JsonResponse(['error' => 'Produit non trouvé'], 404);
+        }
+
+        // Créez un tableau contenant les données du produit
+        $data = [
+            'id' => $produit->getId(),
+            'name' => $produit->getNomDuProduit(),
+            'price' => $produit->getPrix(),
+            'imageUrl' => $produit->getImageUrl()
+        ];
+
+        // Retournez les données sous forme de réponse JSON
+        return new JsonResponse($data, 200);
     }
 
 

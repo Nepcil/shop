@@ -37,6 +37,13 @@ class Favoris
     private $produitid;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(name="state", type="boolean", nullable=false)
+     */
+    private $state;
+
+    /**
      * @ORM\Column(type="datetime") 
      */
     private $date;
@@ -46,24 +53,40 @@ class Favoris
     {
         return $this->id;
     }
+
     public function getUserid(): ?int
     {
         return $this->userid;
     }
+
     public function setUserid(?int $userid): self
     {
         $this->userid = $userid;
         return $this;
     }
+
     public function getProduitid(): ?int
     {
         return $this->produitid;
     }
+
     public function setProduitid(?int $produitid): self
     {
         $this->produitid = $produitid;
         return $this;
     }
+
+    public function getState(): ?bool
+    {
+        return $this->state;
+    }
+
+    public function setState(bool $state): self
+    {
+        $this->state = $state;
+        return $this;
+    }
+
     public function getDate(): ?DateTime
     {
         return $this->date;
