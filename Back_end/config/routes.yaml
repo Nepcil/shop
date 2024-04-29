@@ -22,6 +22,11 @@ lastvideos:
     controller: App\Controller\ProduitsController::lastVideos
     methods: GET
 
+best_products:
+    path: /best
+    controller: App\Controller\ProduitsController::bestProducts
+    methods: GET
+
 # -------------------------- vendeur ------------------------
     
 vendeur:

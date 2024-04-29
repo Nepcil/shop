@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\BestProducts;
 use App\Entity\Categories;
 use App\Entity\Produits;
+use App\Repository\BestProductsRepository;
 use App\Repository\CategoriesRepository;
 use App\Repository\ProduitsRepository;
 use DateTime;
@@ -35,7 +37,7 @@ class ProduitsController extends AbstractController
     }
 
     /**
-     * @Route("/", name="last_videos", methods={"GET"})
+     * @Route("/", name="last_videos", methods="GET")
      */
     public function lastvideos(ProduitsRepository $product) 
     {
@@ -59,6 +61,42 @@ class ProduitsController extends AbstractController
             ];
         }
         
+        return new JsonResponse($data, 200);
+    }
+    
+
+    /**
+     * @Route("/best", name="best_products", methods="GET")
+     */
+    public function bestProducts(ProduitsRepository $product, BestProductsRepository $bestProductsRepository) 
+    {
+        $bests = $bestProductsRepository->findBy([], ['date' => 'DESC'], 10);
+
+        if (empty($bests)) {
+            return new JsonResponse(['error' => 'Aucun meilleur produit trouvé'], 404);
+        }
+
+        $productIds = [];
+        foreach ($bests as $best) {
+            $productIds[] = $best->getProduitid(); 
+        }
+
+        $products = $product->findBy(['id' => $productIds]);
+
+        if (empty($products)) {
+            return new JsonResponse(['error' => 'Aucun produit trouvé'], 404);
+        }
+
+        $data = [];
+        foreach ($products as $product) {
+            $data[] = [
+                'id' => $product->getId(),
+                'name' => $product->getNomduProduit(),
+                'description' => $product->getDescription(),
+                'imageUrl' => $product->getImageurl(),
+                'price' =>$product->getPrix()
+            ];
+        }
 
         return new JsonResponse($data, 200);
     }
@@ -306,5 +344,7 @@ class ProduitsController extends AbstractController
 
         return new JsonResponse(['Status' => 'Produit supprimé avec succès'], 200);
     }
+
+    
 
 }
