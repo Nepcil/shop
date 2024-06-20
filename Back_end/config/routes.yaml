@@ -235,3 +235,10 @@ get_all_favoris:
     path: /favoris/all/{id}
     controller: App\Controller\FavorisController::getAllFavorisUser
     methods: GET
+
+# ------------------------- Promos -----------------------
+
+get_promos:
+    path: /promos/{id}
+    controller: App\Controller\PromosController::getPromos
+    methods: GET

@@ -21,6 +21,24 @@ class PromosRepository extends ServiceEntityRepository
         parent::__construct($registry, Promos::class);
     }
 
+    public function save(Promos $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function remove(Promos $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
 //    /**
 //     * @return Promos[] Returns an array of Promos objects
 //     */

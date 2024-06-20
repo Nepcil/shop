@@ -6,8 +6,6 @@ use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Promos
- *
  * @ORM\Table(name="promos")
  * @ORM\Entity
  */
@@ -16,39 +14,58 @@ class Promos
     /**
      * @var int
      *
-     * @ORM\Column(name="ID", type="integer", nullable=false)
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @ORM\Column(name="ID", type="integer", nullable=false)
      */
     private $id;
 
     /**
-     * @ORM\Column(name="produitid", type="integer", nullable=true) 
+     * @var int
+     * 
+     * @ORM\Column(name="produitid", type="integer", nullable=false) 
      */
     private $produitid;
 
     /**
-     * @ORM\Column(type="promo", type="float", nullable=true) 
+     * @var float
+     * 
+     * @ORM\Column(name="promo", type="float", nullable=false) 
      */
     private $promo;
 
     /**
-     * @ORM\Column(type="pourcent", type="integer", nullable=true) 
+     * @var int
+     * 
+     * @ORM\Column(name="pourcent", type="integer", nullable=false) 
      */
     private $pourcent;
 
     /**
-     * @ORM\Column(type="datetime") 
+     * @var string
+     * 
+     * @ORM\Column(name="promotitle", type="string", nullable=false) 
      */
-    private $dateIn;
+    private $promotitle;
 
     /**
-     * @ORM\Column(type="datetime") 
+     * @var DateTime
+     * 
+     * @ORM\Column(name="datein", type="datetime", nullable=false) 
      */
-    private $dateOut;
+    private $datein;
 
     /**
-     * @ORM\Column(type="datetime") 
+     * @var DateTime
+     * 
+     * @ORM\Column(name="dateout", type="datetime", nullable=false) 
+     */
+    private $dateout;
+
+    /**
+     * @var DateTime
+     * 
+     * @ORM\Column(name="date", type="datetime", nullable=false) 
      */
     private $date;
 
@@ -94,26 +111,38 @@ class Promos
         return $this;
     }
 
-    public function getDateIn(): ?DateTime
+    public function getPromotitle(): ?string
     {
-        return $this->dateIn;
+        return $this->promotitle;
     }
 
-    public function setDateIn(DateTime $dateIn): self
+    public function setPromotitle(?string $promotitle): self
     {
-        $this->dateIn = $dateIn;
+        $this->promotitle = $promotitle;
 
         return $this;
     }
 
-    public function getDateOut(): ?DateTime
+    public function getDatein(): ?DateTime
     {
-        return $this->dateOut;
+        return $this->datein;
     }
 
-    public function setDateOut(DateTime $dateOut): self
+    public function setDatein(DateTime $datein): self
     {
-        $this->date = $dateOut;
+        $this->datein = $datein;
+
+        return $this;
+    }
+
+    public function getDateout(): ?DateTime
+    {
+        return $this->dateout;
+    }
+
+    public function setDateout(DateTime $dateout): self
+    {
+        $this->dateout = $dateout;
 
         return $this;
     }
@@ -129,6 +158,4 @@ class Promos
 
         return $this;
     }
-
-
 }
