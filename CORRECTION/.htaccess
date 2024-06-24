@@ -32,14 +32,17 @@ Options -Indexes
   </FilesMatch>
 </IfModule>
 
+
 # Autoriser l'accès à partir de tous les appareils
 <IfModule mod_headers.c>
   Header set Access-Control-Allow-Origin "*"
 </IfModule>
 
+
 # Bloquer l'accès à certains fichiers sensibles
-<FilesMatch "(^\.|\.md|\.sh|composer\.json|composer\.lock|CONTRIBUTING\.md|README\.md|readme\.txt)">
-  Order allow,deny
-  Deny from all
-  Satisfy All
-</FilesMatch>
+# <FilesMatch "(^\.|\.md|\.sh|composer\.json|composer\.lock|CONTRIBUTING\.md|README\.md|readme\.txt)">
+#   Order allow,deny
+#   Deny from all
+#   Satisfy All
+# </FilesMatch>
+
